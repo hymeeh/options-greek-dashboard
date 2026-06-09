@@ -7,6 +7,13 @@ from scipy.interpolate import interp1d
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
+import pytz
+
+_EST = pytz.timezone("America/New_York")
+
+def now_est():
+    """Return current datetime in US/Eastern (EST/EDT)."""
+    return datetime.now(pytz.utc).astimezone(_EST)
 import warnings, io, json, zipfile
 import plotly.io as pio
 warnings.filterwarnings("ignore")
@@ -82,8 +89,8 @@ def fetch_chain(ticker: str):
     rows = []
     for exp in expirations:
         exp_date = datetime.strptime(exp, "%Y-%m-%d")
-        T = max((exp_date - datetime.now()).days / 365, 1 / 365)
-        dte = max((exp_date - datetime.now()).days, 0)
+        T = max((exp_date - now_est().replace(tzinfo=None)).days / 365, 1 / 365)
+        dte = max((exp_date - now_est().replace(tzinfo=None)).days, 0)
 
         try:
             chain = tk.option_chain(exp)
@@ -138,7 +145,7 @@ def fetch_chain(ticker: str):
         return None, None, None, None, None
 
     df_all = pd.DataFrame(rows)
-    fetched_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    fetched_at = now_est().strftime("%Y-%m-%d %H:%M:%S EST")
     return S, S_prev, df_all, fetched_at, hist30
 
 
@@ -448,7 +455,7 @@ def build_dex_heatmap(df, spot, ticker, hist30=None, levels=None, net_gex=0):
     price_grid = np.arange(lo, hi + step, step)   # ascending
 
     # X: DTE values (numeric) — gives continuous axis, no "Today" artefact
-    today    = datetime.now()
+    today    = now_est().replace(tzinfo=None)
     dte_vals = []
     for exp in expiries:
         dte_vals.append(max((datetime.strptime(exp, "%Y-%m-%d") - today).days, 1))
@@ -706,7 +713,7 @@ def build_gex_heatmap_fig(df_g, spot):
     col_labels = []
     for exp in expiry_cols:
         d = datetime.strptime(exp, "%Y-%m-%d")
-        dte_v = max((d - datetime.now()).days, 0)
+        dte_v = max((d - now_est().replace(tzinfo=None)).days, 0)
         col_labels.append(f"{d.strftime('%b %d')} ({dte_v}d)")
 
     z = pivot.values.tolist()
@@ -841,8 +848,8 @@ if export_clicked:
         au  = levels["accel_up"];      ad  = levels["accel_down"]
         pct_0dte = levels["pct_0dte"]
 
-        ts    = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        fn_ts = datetime.now().strftime("%Y%m%d_%H%M")
+        ts    = now_est().strftime("%Y-%m-%d %H:%M:%S EST")
+        fn_ts = now_est().strftime("%Y%m%d_%H%M")
 
         # ── render all charts ─────────────────────────────────────────────────
         # 1. GEX Strike Profile (All strikes)
