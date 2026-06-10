@@ -14,8 +14,9 @@ _EST = pytz.timezone("America/New_York")
 def now_est():
     """Return current datetime in US/Eastern (EST/EDT)."""
     return datetime.now(pytz.utc).astimezone(_EST)
-import warnings, io, json, zipfile
+import warnings, io, json, zipfile, base64
 import plotly.io as pio
+import streamlit.components.v1 as components
 warnings.filterwarnings("ignore")
 
 st.set_page_config(page_title="Options Greek Exposure", layout="wide", initial_sidebar_state="collapsed")
@@ -1031,9 +1032,20 @@ if export_clicked:
 
         fname = f"{ticker}_greek_exposure_{fn_ts}.html"
 
-    st.success("Report ready — click below to download.")
+    st.success(f"Report ready — downloading {fname}…")
+
+    b64_html = base64.b64encode(html.encode("utf-8")).decode()
+    components.html(
+        f"""
+        <a id="auto_dl" href="data:text/html;base64,{b64_html}" download="{fname}"></a>
+        <script>document.getElementById('auto_dl').click();</script>
+        """,
+        height=0,
+        width=0,
+    )
+
     st.download_button(
-        label=f"⬇ Download {fname}",
+        label=f"⬇ Download {fname} again",
         data=html,
         file_name=fname,
         mime="text/html",
