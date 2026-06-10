@@ -1050,14 +1050,6 @@ if export_clicked:
         width=0,
     )
 
-    st.download_button(
-        label=f"⬇ Download {fname} again",
-        data=html,
-        file_name=fname,
-        mime="text/html",
-        use_container_width=True,
-    )
-
 # ── Tabs ──────────────────────────────────────────────────────────────────────
 tab_sum, tab_spot, tab_gamma, tab_delta, tab_vanna, tab_charm = st.tabs(
     ["Summary", "Spot", "Gamma", "Delta", "Vanna", "Charm"]
