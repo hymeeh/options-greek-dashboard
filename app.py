@@ -778,7 +778,11 @@ if refresh:
     st.cache_data.clear()
 
 with st.spinner(f"Loading {ticker} options chain…"):
-    spot, spot_prev, df, fetched_at, hist30 = fetch_chain(ticker)
+    try:
+        spot, spot_prev, df, fetched_at, hist30 = fetch_chain(ticker)
+    except Exception as e:
+        st.error(f"⚠️ Page is not available: {e}\n\nPlease try again later.")
+        st.stop()
 
 if df is None or df.empty:
     st.error(f"No options data found for **{ticker}**. Try a different ticker.")
