@@ -1037,8 +1037,14 @@ if export_clicked:
     b64_html = base64.b64encode(html.encode("utf-8")).decode()
     components.html(
         f"""
-        <a id="auto_dl" href="data:text/html;base64,{b64_html}" download="{fname}"></a>
-        <script>document.getElementById('auto_dl').click();</script>
+        <script>
+        const a = window.parent.document.createElement('a');
+        a.href = "data:text/html;base64,{b64_html}";
+        a.download = "{fname}";
+        window.parent.document.body.appendChild(a);
+        a.click();
+        window.parent.document.body.removeChild(a);
+        </script>
         """,
         height=0,
         width=0,
