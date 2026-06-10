@@ -805,7 +805,6 @@ with export_col:
 
 # ── Export ───────────────────────────────────────────────────────────────────
 if export_clicked:
-    import base64, pathlib
 
     with st.spinner("Building HTML report — rendering charts…"):
 
@@ -1030,14 +1029,16 @@ if export_clicked:
 </body>
 </html>"""
 
-        # Write directly to Downloads folder
-        downloads = pathlib.Path.home() / "Downloads"
         fname = f"{ticker}_greek_exposure_{fn_ts}.html"
-        out_path = downloads / fname
-        out_path.write_text(html, encoding="utf-8")
 
-    st.success(f"Saved to **Downloads/{fname}** — open it in any browser, then upload the file to Claude.")
-    st.caption(f"Full path: `{out_path}`")
+    st.success("Report ready — click below to download.")
+    st.download_button(
+        label=f"⬇ Download {fname}",
+        data=html,
+        file_name=fname,
+        mime="text/html",
+        use_container_width=True,
+    )
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
 tab_sum, tab_spot, tab_gamma, tab_delta, tab_vanna, tab_charm = st.tabs(
